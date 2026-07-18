@@ -1,4 +1,4 @@
-name: Déployer Sanity Studio
+name: Déployer Aicha (Sanity Studio)
 
 on:
   repository_dispatch:
