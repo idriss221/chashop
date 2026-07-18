@@ -4,7 +4,7 @@
 // pour que les deux pages travaillent avec exactement les mêmes données/règles.
 // ===========================
 
-const WHATSAPP_NUMBER = '221770673233'; // format international sans + ni espaces
+const WHATSAPP_NUMBER = '221771767071'; // format international sans + ni espaces
 
 // ⚠️ NOTE SÉCURITÉ / LIMITES — à lire avant mise en production
 // Ce mot de passe admin, le catalogue de produits ET les commandes sont
