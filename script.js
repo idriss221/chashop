@@ -1,13 +1,15 @@
 // ===========================
 // CHACHA — Boutique (script.js)
 // La configuration, les données produits par défaut et les fonctions de
-// stockage partagées avec l'espace admin vivent dans common.js (chargé avant
-// ce fichier dans index.html).
+// synchronisation Firebase (partagées avec l'espace admin) vivent dans
+// common.js (chargé avant ce fichier dans index.html).
 // ===========================
 
-// Catalogue actif : depuis localStorage si l'admin l'a déjà modifié, sinon les valeurs par défaut
-let allProducts = loadProducts();
-let allOrders = loadOrders();
+// Catalogue et commandes : mis à jour automatiquement en temps réel dès que
+// quelque chose change sur n'importe quel appareil (voir subscribeToProducts
+// / subscribeToOrders ci-dessous).
+let allProducts = [];
+let allOrders = [];
 
 // ===========================
 // Rendu des cartes produit
@@ -314,45 +316,54 @@ document.getElementById('addressForm').addEventListener('submit', (e)=>{
     status: 'nouvelle',
     createdAt: new Date().toISOString()
   };
-  allOrders.unshift(order);
-  persistOrders(allOrders);
 
-  // Récap visuel de confirmation
-  document.getElementById('confirmName').textContent = order.fullName;
-  document.getElementById('confirmOrderId').textContent = '#' + order.id;
-  document.getElementById('confirmRecap').innerHTML = `
-    <div>📦 <strong>${items.reduce((s,i)=>s+i.qty,0)} article(s)</strong> — ${formatFCFA(total)}</div>
-    <div>📍 ${order.neighborhood}, ${order.city}</div>
-    <div>📞 ${order.phone}</div>
-    <div>🔖 Numéro de suivi : <strong>${order.id}</strong></div>
-  `;
+  const submitBtn = document.getElementById('addressForm').querySelector('button[type="submit"]');
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Envoi en cours…';
 
-  // Message WhatsApp pré-rempli vers la boutique (le client peut l'envoyer pour accélérer le contact)
-  const lines = [
-    `🛍️ *Nouvelle commande CHACHA* #${order.id}`,
-    ``,
-    `👤 Client : ${order.fullName}`,
-    `📞 Téléphone : ${order.phone}`,
-    `📍 Adresse : ${order.addressDetails}, ${order.neighborhood}, ${order.city}`,
-    order.addressNote ? `📝 Note : ${order.addressNote}` : null,
-    ``,
-    `🧾 Articles :`,
-    ...items.map(i => `• ${i.name} ×${i.qty} — ${formatFCFA(i.lineTotal)}`),
-    ``,
-    `💰 Total : ${formatFCFA(total)}`,
-    `Merci de me contacter pour finaliser le paiement 🙏`
-  ].filter(Boolean);
-  const whatsappMessage = encodeURIComponent(lines.join('\n'));
-  const whatsappURL = `https://wa.me/${WHATSAPP_NUMBER}?text=${whatsappMessage}`;
-  document.getElementById('sendWhatsappBtn').href = whatsappURL;
-  document.getElementById('sendWhatsappBtn').onclick = ()=> window.open(whatsappURL, '_blank');
+  saveOrderRemote(order).then(()=>{
+    // Récap visuel de confirmation
+    document.getElementById('confirmName').textContent = order.fullName;
+    document.getElementById('confirmOrderId').textContent = '#' + order.id;
+    document.getElementById('confirmRecap').innerHTML = `
+      <div>📦 <strong>${items.reduce((s,i)=>s+i.qty,0)} article(s)</strong> — ${formatFCFA(total)}</div>
+      <div>📍 ${order.neighborhood}, ${order.city}</div>
+      <div>📞 ${order.phone}</div>
+      <div>🔖 Numéro de suivi : <strong>${order.id}</strong></div>
+    `;
 
-  setStep(3);
-  document.getElementById('addressForm').reset();
+    // Message WhatsApp pré-rempli vers la boutique (le client peut l'envoyer pour accélérer le contact)
+    const lines = [
+      `🛍️ *Nouvelle commande CHACHA* #${order.id}`,
+      ``,
+      `👤 Client : ${order.fullName}`,
+      `📞 Téléphone : ${order.phone}`,
+      `📍 Adresse : ${order.addressDetails}, ${order.neighborhood}, ${order.city}`,
+      order.addressNote ? `📝 Note : ${order.addressNote}` : null,
+      ``,
+      `🧾 Articles :`,
+      ...items.map(i => `• ${i.name} ×${i.qty} — ${formatFCFA(i.lineTotal)}`),
+      ``,
+      `💰 Total : ${formatFCFA(total)}`,
+      `Merci de me contacter pour finaliser le paiement 🙏`
+    ].filter(Boolean);
+    const whatsappMessage = encodeURIComponent(lines.join('\n'));
+    const whatsappURL = `https://wa.me/${WHATSAPP_NUMBER}?text=${whatsappMessage}`;
+    document.getElementById('sendWhatsappBtn').href = whatsappURL;
+    document.getElementById('sendWhatsappBtn').onclick = ()=> window.open(whatsappURL, '_blank');
 
-  // Vider le panier après confirmation
-  cart = [];
-  renderCart();
+    setStep(3);
+    document.getElementById('addressForm').reset();
+
+    // Vider le panier après confirmation
+    cart = [];
+    renderCart();
+  }).catch(()=>{
+    showToast('Impossible d\'enregistrer ta commande — vérifie ta connexion internet et réessaie');
+  }).finally(()=>{
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Valider ma commande';
+  });
 });
 
 document.getElementById('closeConfirm').addEventListener('click', closeCheckout);
@@ -447,7 +458,7 @@ function trackResultHTML(order){
 // ===========================
 // Bouton flottant WhatsApp + footer
 // ===========================
-const genericWhatsappURL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Bonjour CHACHA SHOP VIP, je voudrais passer une commande 🙂')}`;
+const genericWhatsappURL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Bonjour CHACHA, je voudrais passer une commande 🙂')}`;
 document.getElementById('whatsappFloat').href = genericWhatsappURL;
 document.getElementById('footerWhatsapp').href = genericWhatsappURL;
 document.getElementById('footerWhatsapp').target = '_blank';
@@ -644,7 +655,15 @@ lightboxZoomWrap.addEventListener('wheel', (e)=>{
 }, { passive:false });
 
 // ===========================
-// Rendu initial
+// Synchronisation en temps réel (Firebase)
+// Dès qu'un produit ou une commande change — sur CET appareil ou sur
+// n'importe quel autre — ces fonctions se redéclenchent automatiquement.
 // ===========================
-renderAllGrids();
-renderCart();
+subscribeToProducts((list)=>{
+  allProducts = list;
+  renderAllGrids();
+  renderCart(); // les prix/noms affichés dans le panier peuvent avoir changé
+});
+subscribeToOrders((list)=>{
+  allOrders = list; // utilisé par le suivi de commande
+});

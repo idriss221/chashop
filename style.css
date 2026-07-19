@@ -1317,6 +1317,39 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   margin-top:2px;
 }
 
+/* Bandeau transfert de données (export / import manuel) */
+.admin-transfer-bar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+  flex-wrap:wrap;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:16px 18px;
+  margin-bottom:24px;
+}
+.admin-transfer-text strong{
+  font-size:.86rem;
+  font-weight:800;
+  display:block;
+  margin-bottom:3px;
+}
+.admin-transfer-text p{
+  font-size:.78rem;
+  color:var(--ink-soft);
+  line-height:1.5;
+  max-width:520px;
+  font-weight:500;
+}
+.admin-transfer-actions{
+  display:flex;
+  gap:10px;
+  flex-shrink:0;
+}
+.admin-transfer-actions .btn{padding:10px 16px; font-size:.8rem;}
+
 /* Panneaux (Produits / Commandes) */
 .admin-panel{background:transparent;}
 .admin-page-title{

@@ -1,11 +1,13 @@
 // ===========================
 // CHACHA — Espace Admin (admin.js)
-// Page dédiée : admin.html. Utilise les données/constantes partagées de
-// common.js (chargé avant ce fichier).
+// Page dédiée : admin.html. Utilise les données/fonctions de synchronisation
+// Firebase de common.js (chargé avant ce fichier). Tout ajout/suppression/
+// modification est écrit dans Firebase et apparaît automatiquement sur tous
+// les appareils connectés (boutique et admin), en temps réel.
 // ===========================
 
-let allProducts = loadProducts();
-let allOrders = loadOrders();
+let allProducts = [];
+let allOrders = [];
 
 let productFilter = 'all';   // all | shoe | cloth
 let orderFilter = 'all';     // all | nouvelle | preparation | livraison | livree ...
@@ -123,6 +125,27 @@ function updateOrdersCountBadge(){
 }
 
 // ===========================
+// Synchronisation en temps réel (Firebase)
+// Dès qu'un produit ou une commande change — ajouté depuis CET appareil ou
+// depuis n'importe quel autre — le tableau de bord se met à jour tout seul.
+// ===========================
+subscribeToProducts((list)=>{
+  allProducts = list;
+  if(!adminDashboard.hidden){
+    renderAdminProductList();
+    renderStats();
+  }
+});
+subscribeToOrders((list)=>{
+  allOrders = list;
+  updateOrdersCountBadge();
+  if(!adminDashboard.hidden){
+    renderAdminOrderList();
+    renderStats();
+  }
+});
+
+// ===========================
 // Onglet Produits
 // ===========================
 const productFilterRow = document.querySelector('#panelProduits .admin-filter-row');
@@ -164,12 +187,12 @@ document.getElementById('adminProductList').addEventListener('click', (e)=>{
   const delBtn = e.target.closest('[data-delete]');
   if(delBtn){
     const product = allProducts.find(p => p.id === delBtn.dataset.delete);
-    if(product && confirm(`Supprimer "${product.name}" ? Cette action est définitive.`)){
-      allProducts = allProducts.filter(p => p.id !== delBtn.dataset.delete);
-      persistProducts(allProducts);
-      renderAdminProductList();
-      renderStats();
-      showToast('Produit supprimé');
+    if(product && confirm(`Supprimer "${product.name}" ? Cette action est définitive et s'appliquera sur tous les appareils.`)){
+      deleteProductRemote(delBtn.dataset.delete).then(()=>{
+        showToast('Produit supprimé');
+      }).catch(()=>{
+        showToast('Erreur réseau — impossible de supprimer ce produit, réessaie');
+      });
     }
   }
 });
@@ -305,7 +328,10 @@ document.getElementById('adminProductForm').addEventListener('submit', (e)=>{
     return;
   }
 
-  const data = {
+  const existing = id ? allProducts.find(p => p.id === id) : null;
+  const finalProduct = {
+    ...(existing || {}),
+    id: id || genId(),
     name: document.getElementById('adminName').value.trim(),
     type: document.getElementById('adminType').value,
     cat: document.getElementById('adminCat').value.trim(),
@@ -316,26 +342,22 @@ document.getElementById('adminProductForm').addEventListener('submit', (e)=>{
     colors
   };
 
-  const previousProducts = allProducts;
-  if(id){
-    const idx = allProducts.findIndex(p => p.id === id);
-    if(idx > -1) allProducts = allProducts.map((p,i)=> i === idx ? { ...p, ...data } : p);
-  } else {
-    allProducts = [...allProducts, { id: genId(), ...data }];
-  }
+  const submitBtn = document.getElementById('adminProductForm').querySelector('button[type="submit"]');
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Enregistrement…';
 
-  try{
-    persistProducts(allProducts);
-  }catch(err){
-    allProducts = previousProducts;
-    showToast('Stockage plein — essaie une photo plus légère ou une URL d\'image à la place');
-    return;
-  }
-
-  showToast(id ? 'Produit mis à jour' : 'Produit ajouté');
-  adminFormOverlay.classList.remove('open');
-  renderAdminProductList();
-  renderStats();
+  saveProductRemote(finalProduct).then(()=>{
+    showToast(id ? 'Produit mis à jour sur tous les appareils' : 'Produit ajouté sur tous les appareils');
+    adminFormOverlay.classList.remove('open');
+    // Pas besoin de re-render manuellement : la synchronisation en temps
+    // réel (subscribeToProducts) met déjà le tableau de bord à jour, ici et
+    // sur tous les autres appareils.
+  }).catch(()=>{
+    showToast('Erreur réseau — impossible d\'enregistrer ce produit, réessaie');
+  }).finally(()=>{
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Enregistrer';
+  });
 });
 
 // ===========================
@@ -398,13 +420,13 @@ document.getElementById('adminOrderList').addEventListener('change', (e)=>{
   const select = e.target.closest('[data-status-select]');
   if(!select) return;
   const orderId = select.dataset.statusSelect;
-  const order = allOrders.find(o => o.id === orderId);
-  if(!order) return;
-  order.status = select.value;
-  persistOrders(allOrders);
-  renderAdminOrderList();
-  renderStats();
-  showToast('Statut de la commande mis à jour');
+  const previousValue = allOrders.find(o => o.id === orderId)?.status;
+  updateOrderStatusRemote(orderId, select.value).then(()=>{
+    showToast('Statut de la commande mis à jour sur tous les appareils');
+  }).catch(()=>{
+    if(previousValue) select.value = previousValue;
+    showToast('Erreur réseau — impossible de mettre à jour le statut, réessaie');
+  });
 });
 
 document.getElementById('adminOrderList').addEventListener('click', (e)=>{
@@ -414,7 +436,7 @@ document.getElementById('adminOrderList').addEventListener('click', (e)=>{
   if(!order) return;
 
   const lines = [
-    `Bonjour ${order.fullName} 👋, ici CHACHA SHOP VIP.`,
+    `Bonjour ${order.fullName} 👋, ici CHACHA.`,
     `Je vous contacte au sujet de votre commande #${order.id} (${formatFCFA(order.total)}) pour finaliser le paiement et organiser la livraison.`
   ];
   const msg = encodeURIComponent(lines.join('\n'));
@@ -433,3 +455,66 @@ function showToast(msg){
   clearTimeout(toastTimer);
   toastTimer = setTimeout(()=> toastEl.classList.remove('show'), 2400);
 }
+
+// ===========================
+// Transfert de données entre appareils (export / import manuel)
+// ===========================
+function exportBackup(){
+  const payload = {
+    app: 'chacha',
+    exportedAt: new Date().toISOString(),
+    products: allProducts,
+    orders: allOrders
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type:'application/json' });
+  const url = URL.createObjectURL(blob);
+  const dateStamp = new Date().toISOString().slice(0,10);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `chacha-sauvegarde-${dateStamp}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  showToast('Sauvegarde exportée — transfère ce fichier sur ton autre appareil');
+}
+
+function importBackupFromFile(file){
+  const reader = new FileReader();
+  reader.onerror = () => showToast('Impossible de lire ce fichier');
+  reader.onload = () => {
+    let parsed;
+    try{
+      parsed = JSON.parse(reader.result);
+    }catch(err){
+      showToast('Fichier invalide — ce n\'est pas une sauvegarde CHACHA reconnue');
+      return;
+    }
+    const importedProducts = Array.isArray(parsed.products) ? parsed.products : [];
+    const importedOrders = Array.isArray(parsed.orders) ? parsed.orders : [];
+    if(importedProducts.length === 0 && importedOrders.length === 0){
+      showToast('Ce fichier ne contient aucun produit ni commande à importer');
+      return;
+    }
+
+    const confirmMsg = `Importer ${importedProducts.length} produit(s) et ${importedOrders.length} commande(s) ?\n\nCes éléments seront synchronisés sur tous les appareils. Ceux déjà présents avec le même identifiant seront mis à jour ; rien d'autre ne sera supprimé.`;
+    if(!confirm(confirmMsg)) return;
+
+    bulkImportRemote(importedProducts, importedOrders).then(()=>{
+      showToast('Importation terminée ✅ — synchronisée sur tous les appareils');
+    }).catch(()=>{
+      showToast('Erreur réseau — impossible de terminer l\'import, réessaie');
+    });
+  };
+  reader.readAsText(file);
+}
+
+document.getElementById('adminExportBtn').addEventListener('click', exportBackup);
+
+const adminImportFileInput = document.getElementById('adminImportFile');
+document.getElementById('adminImportBtn').addEventListener('click', ()=> adminImportFileInput.click());
+adminImportFileInput.addEventListener('change', (e)=>{
+  const file = e.target.files[0];
+  if(file) importBackupFromFile(file);
+  adminImportFileInput.value = '';
+});

@@ -1,28 +1,34 @@
 // ===========================
 // CHACHA — Données & utilitaires partagés
-// Ce fichier est chargé par index.html (boutique) ET admin.html (espace admin)
-// pour que les deux pages travaillent avec exactement les mêmes données/règles.
+// Ce fichier est chargé par index.html (boutique) ET admin.html (espace admin),
+// APRÈS le SDK Firebase et firebase-config.js. Produits et commandes sont
+// stockés dans Firebase Realtime Database : tout ajout/suppression/
+// modification faite sur un appareil apparaît automatiquement sur tous les
+// autres, en temps réel, sans rien exporter/importer.
 // ===========================
 
-const WHATSAPP_NUMBER = '221771767071'; // format international sans + ni espaces
+const WHATSAPP_NUMBER = '221770673233'; // format international sans + ni espaces
 
-// ⚠️ NOTE SÉCURITÉ / LIMITES — à lire avant mise en production
-// Ce mot de passe admin, le catalogue de produits ET les commandes sont
-// gérés uniquement côté navigateur (localStorage), il n'y a pas de serveur.
-// Conséquences importantes :
-//  1) N'importe qui inspectant le code source peut voir ce mot de passe.
-//  2) Les commandes passées par un client depuis SON navigateur ne sont
-//     visibles dans l'espace admin QUE si l'admin ouvre ce même site depuis
-//     LE MÊME appareil/navigateur que celui du client (pas de synchronisation
-//     entre appareils différents). Pareil pour les produits ajoutés par l'admin.
-// Pour un vrai site en production, avec de vrais clients sur leurs propres
-// téléphones et un admin qui doit voir TOUTES les commandes depuis son propre
-// appareil, il faut un petit backend (base de données partagée) qui stocke
-// produits et commandes côté serveur — localStorage ne peut pas remplacer ça.
+// ⚠️ NOTE SÉCURITÉ — à lire avant mise en production
+// Le catalogue de produits et les commandes vivent maintenant dans une base
+// de données partagée dans le cloud (Firebase Realtime Database) : c'est ce
+// qui permet la synchronisation automatique entre appareils.
+// Deux points importants à connaître :
+//  1) Le mot de passe admin ci-dessous n'est vérifié que dans le navigateur
+//     (il n'y a pas de vrai compte utilisateur) — n'importe qui inspectant
+//     le code source peut le voir.
+//  2) Tant que les règles de sécurité Firebase sont en "mode test" (lecture/
+//     écriture ouvertes à tous), toute personne connaissant l'adresse de ta
+//     base de données pourrait, en théorie, la modifier directement en
+//     contournant le mot de passe admin. Le mode test expire aussi
+//     automatiquement au bout de 30 jours (la base devient alors bloquée en
+//     lecture ET écriture tant que les règles ne sont pas mises à jour dans
+//     la console Firebase). Pour un site avec de vraies commandes de
+//     clients, il est recommandé de passer à des règles plus strictes
+//     (idéalement avec Firebase Authentication) — demande-moi si tu veux
+//     qu'on les mette en place.
 const ADMIN_PASSWORD = 'chacha2026';
 const ADMIN_SESSION_KEY = 'chacha_admin_session';
-const PRODUCTS_STORAGE_KEY = 'chacha_products';
-const ORDERS_STORAGE_KEY = 'chacha_orders';
 
 // ===========================
 // Statuts de commande
@@ -44,7 +50,8 @@ function getStatusMeta(key){
 }
 
 // ===========================
-// Données produits par défaut
+// Catalogue par défaut — sert uniquement à "amorcer" la base de données la
+// toute première fois qu'elle est vide (premier lancement du site).
 // ===========================
 const defaultProducts = [
   // --- Chaussures ---
@@ -68,34 +75,59 @@ const defaultProducts = [
 ];
 
 // ===========================
-// Persistance (localStorage)
+// Connexion Firebase Realtime Database
+// (`firebase` et la config viennent des <script> chargés avant ce fichier :
+// SDK Firebase, puis firebase-config.js)
 // ===========================
-function loadProducts(){
-  const stored = localStorage.getItem(PRODUCTS_STORAGE_KEY);
-  if(stored){
-    try{
-      const parsed = JSON.parse(stored);
-      if(Array.isArray(parsed)) return parsed;
-    }catch(e){ /* stockage corrompu, on retombe sur les valeurs par défaut */ }
+const productsRef = firebase.database().ref('products');
+const ordersRef = firebase.database().ref('orders');
+
+// Amorce la base avec le catalogue par défaut si elle est encore complètement
+// vide (ne se déclenche qu'une seule fois, la toute première fois que
+// quelqu'un ouvre le site après la mise en place de Firebase).
+productsRef.once('value').then(snapshot => {
+  if(!snapshot.exists()){
+    const seed = {};
+    defaultProducts.forEach(p => { seed[p.id] = p; });
+    productsRef.set(seed);
   }
-  return JSON.parse(JSON.stringify(defaultProducts));
+}).catch(()=>{ /* Firebase pas encore configuré — voir firebase-config.js */ });
+
+// ---------- Produits : lecture en temps réel + écriture ----------
+function subscribeToProducts(onChange){
+  productsRef.on('value', snapshot => {
+    const val = snapshot.val() || {};
+    onChange(Object.values(val));
+  });
 }
-function persistProducts(products){
-  localStorage.setItem(PRODUCTS_STORAGE_KEY, JSON.stringify(products));
+function saveProductRemote(product){
+  return productsRef.child(product.id).set(product);
+}
+function deleteProductRemote(id){
+  return productsRef.child(id).remove();
 }
 
-function loadOrders(){
-  const stored = localStorage.getItem(ORDERS_STORAGE_KEY);
-  if(stored){
-    try{
-      const parsed = JSON.parse(stored);
-      if(Array.isArray(parsed)) return parsed;
-    }catch(e){ /* stockage corrompu */ }
-  }
-  return [];
+// ---------- Commandes : lecture en temps réel + écriture ----------
+function subscribeToOrders(onChange){
+  ordersRef.on('value', snapshot => {
+    const val = snapshot.val() || {};
+    const list = Object.values(val).sort((a,b)=> new Date(b.createdAt) - new Date(a.createdAt));
+    onChange(list);
+  });
 }
-function persistOrders(orders){
-  localStorage.setItem(ORDERS_STORAGE_KEY, JSON.stringify(orders));
+function saveOrderRemote(order){
+  return ordersRef.child(order.id).set(order);
+}
+function updateOrderStatusRemote(id, status){
+  return ordersRef.child(id).update({ status });
+}
+// Écrit plusieurs produits/commandes d'un coup (utilisé par l'import de sauvegarde) :
+// fusionne avec ce qui existe déjà (remplace les éléments avec le même id).
+function bulkImportRemote(products, orders){
+  const updates = {};
+  (products || []).forEach(p => { if(p && p.id) updates['products/' + p.id] = p; });
+  (orders || []).forEach(o => { if(o && o.id) updates['orders/' + o.id] = o; });
+  return firebase.database().ref().update(updates);
 }
 
 function isAdminLoggedIn(){
