@@ -7,7 +7,7 @@
 // autres, en temps réel, sans rien exporter/importer.
 // ===========================
 
-const WHATSAPP_NUMBER = '221770673233'; // format international sans + ni espaces
+const WHATSAPP_NUMBER = '221771767071'; // format international sans + ni espaces
 
 // ⚠️ NOTE SÉCURITÉ — à lire avant mise en production
 // Le catalogue de produits et les commandes vivent maintenant dans une base

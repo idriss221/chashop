@@ -458,7 +458,7 @@ function trackResultHTML(order){
 // ===========================
 // Bouton flottant WhatsApp + footer
 // ===========================
-const genericWhatsappURL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Bonjour CHACHA, je voudrais passer une commande 🙂')}`;
+const genericWhatsappURL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Bonjour CHACHA SHOP VIP, je voudrais passer une commande 🙂')}`;
 document.getElementById('whatsappFloat').href = genericWhatsappURL;
 document.getElementById('footerWhatsapp').href = genericWhatsappURL;
 document.getElementById('footerWhatsapp').target = '_blank';

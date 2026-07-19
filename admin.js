@@ -436,7 +436,7 @@ document.getElementById('adminOrderList').addEventListener('click', (e)=>{
   if(!order) return;
 
   const lines = [
-    `Bonjour ${order.fullName} 👋, ici CHACHA.`,
+    `Bonjour ${order.fullName} 👋, ici CHACHA SHOP VIP.`,
     `Je vous contacte au sujet de votre commande #${order.id} (${formatFCFA(order.total)}) pour finaliser le paiement et organiser la livraison.`
   ];
   const msg = encodeURIComponent(lines.join('\n'));
@@ -455,66 +455,3 @@ function showToast(msg){
   clearTimeout(toastTimer);
   toastTimer = setTimeout(()=> toastEl.classList.remove('show'), 2400);
 }
-
-// ===========================
-// Transfert de données entre appareils (export / import manuel)
-// ===========================
-function exportBackup(){
-  const payload = {
-    app: 'chacha',
-    exportedAt: new Date().toISOString(),
-    products: allProducts,
-    orders: allOrders
-  };
-  const blob = new Blob([JSON.stringify(payload, null, 2)], { type:'application/json' });
-  const url = URL.createObjectURL(blob);
-  const dateStamp = new Date().toISOString().slice(0,10);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `chacha-sauvegarde-${dateStamp}.json`;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
-  showToast('Sauvegarde exportée — transfère ce fichier sur ton autre appareil');
-}
-
-function importBackupFromFile(file){
-  const reader = new FileReader();
-  reader.onerror = () => showToast('Impossible de lire ce fichier');
-  reader.onload = () => {
-    let parsed;
-    try{
-      parsed = JSON.parse(reader.result);
-    }catch(err){
-      showToast('Fichier invalide — ce n\'est pas une sauvegarde CHACHA reconnue');
-      return;
-    }
-    const importedProducts = Array.isArray(parsed.products) ? parsed.products : [];
-    const importedOrders = Array.isArray(parsed.orders) ? parsed.orders : [];
-    if(importedProducts.length === 0 && importedOrders.length === 0){
-      showToast('Ce fichier ne contient aucun produit ni commande à importer');
-      return;
-    }
-
-    const confirmMsg = `Importer ${importedProducts.length} produit(s) et ${importedOrders.length} commande(s) ?\n\nCes éléments seront synchronisés sur tous les appareils. Ceux déjà présents avec le même identifiant seront mis à jour ; rien d'autre ne sera supprimé.`;
-    if(!confirm(confirmMsg)) return;
-
-    bulkImportRemote(importedProducts, importedOrders).then(()=>{
-      showToast('Importation terminée ✅ — synchronisée sur tous les appareils');
-    }).catch(()=>{
-      showToast('Erreur réseau — impossible de terminer l\'import, réessaie');
-    });
-  };
-  reader.readAsText(file);
-}
-
-document.getElementById('adminExportBtn').addEventListener('click', exportBackup);
-
-const adminImportFileInput = document.getElementById('adminImportFile');
-document.getElementById('adminImportBtn').addEventListener('click', ()=> adminImportFileInput.click());
-adminImportFileInput.addEventListener('change', (e)=>{
-  const file = e.target.files[0];
-  if(file) importBackupFromFile(file);
-  adminImportFileInput.value = '';
-});
