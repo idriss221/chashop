@@ -414,7 +414,7 @@ document.getElementById('adminOrderList').addEventListener('click', (e)=>{
   if(!order) return;
 
   const lines = [
-    `Bonjour ${order.fullName} 👋, ici CHACHA.`,
+    `Bonjour ${order.fullName} 👋, ici CHACHA SHOP VIP.`,
     `Je vous contacte au sujet de votre commande #${order.id} (${formatFCFA(order.total)}) pour finaliser le paiement et organiser la livraison.`
   ];
   const msg = encodeURIComponent(lines.join('\n'));

@@ -326,8 +326,30 @@ input, textarea, select{font-family:inherit;}
   aspect-ratio:1/1;
   overflow:hidden;
   background:var(--bg-soft);
+  cursor:zoom-in;
 }
-.product-img-wrap img{width:100%;height:100%;object-fit:cover;}
+.product-img-wrap img{width:100%;height:100%;object-fit:cover;transition:transform .35s var(--ease);}
+.product-img-wrap:hover img{transform:scale(1.04);}
+.product-zoom-hint{
+  position:absolute;
+  bottom:8px;right:8px;
+  width:28px;height:28px;
+  border-radius:50%;
+  background:rgba(28,28,28,.55);
+  color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.78rem;
+  opacity:0;
+  transform:translateY(4px);
+  transition:opacity .2s var(--ease), transform .2s var(--ease);
+  z-index:2;
+  pointer-events:none;
+}
+.product-img-wrap:hover .product-zoom-hint,
+.product-img-wrap:focus-visible .product-zoom-hint{
+  opacity:1;
+  transform:translateY(0);
+}
 .product-badge{
   position:absolute;top:8px;left:8px;
   color:#fff;
@@ -840,6 +862,86 @@ input, textarea, select{font-family:inherit;}
   display:flex;
   flex-direction:column;
   gap:6px;
+}
+
+/* ===========================
+   PHOTO PRODUIT — lightbox zoom (façon Jumia)
+=========================== */
+.lightbox-overlay{
+  position:fixed;inset:0;
+  background:rgba(10,10,10,.94);
+  z-index:4000;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .25s var(--ease);
+}
+.lightbox-overlay.open{opacity:1; pointer-events:auto;}
+.lightbox-content{
+  width:100%;
+  max-width:600px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  position:relative;
+}
+.lightbox-close{
+  position:absolute;
+  top:-6px; right:-6px;
+  background:#fff;
+  z-index:5;
+}
+.lightbox-zoom-wrap{
+  width:100%;
+  aspect-ratio:1/1;
+  max-height:66vh;
+  background:#111;
+  border-radius:12px;
+  overflow:hidden;
+  position:relative;
+  touch-action:none;
+  cursor:zoom-in;
+}
+.lightbox-zoom-wrap.is-zoomed{cursor:grab;}
+.lightbox-zoom-wrap img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  transform-origin:center center;
+  will-change:transform;
+  user-select:none;
+  -webkit-user-drag:none;
+  touch-action:none;
+}
+.lightbox-hint{
+  color:rgba(255,255,255,.55);
+  font-size:.76rem;
+  font-weight:600;
+  text-align:center;
+  margin-top:12px;
+}
+.lightbox-info{
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  margin-top:14px;
+  background:#fff;
+  border-radius:10px;
+  padding:14px 16px;
+}
+.lightbox-name{font-weight:700; font-size:.92rem; color:var(--ink);}
+.lightbox-price{font-weight:800; font-size:1.05rem; color:var(--accent); margin-top:2px;}
+.lightbox-info .btn{flex-shrink:0; padding:11px 18px; font-size:.82rem;}
+
+@media (max-width: 640px){
+  .lightbox-zoom-wrap{max-height:52vh;}
+  .lightbox-info{flex-direction:column; align-items:stretch; text-align:center;}
+  .lightbox-info .btn{width:100%;}
 }
 
 /* ===========================

@@ -2,7 +2,6 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="google-site-verification" content="Sok2t5JNg8uIAJtdyF1O56INwX5xrdQuV7eXxcINv6w" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CHACHA — Mode &amp; Sneakers</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -73,7 +72,6 @@
       <div class="hero-image-frame">
         <img src="https://images.unsplash.com/photo-1605408499391-6368c628ef42?q=80&w=1200&auto=format&fit=crop" alt="Sneaker phare de la collection" id="heroImg">
       </div>
-      <div class="hero-tag tag-price">25 000 FCFA</div>
       <div class="hero-tag tag-name">ZENITH / Mangue</div>
     </div>
   </div>
@@ -118,7 +116,7 @@
   <div class="lookbook-text" data-reveal>
     <span class="section-eyebrow">Notre histoire</span>
     <h2 class="section-title">Une mode qui nous ressemble vraiment</h2>
-    <p>CHACHA SHOP est né d'une envie simple : porter des couleurs vives, des matières solides, et un style qui tient la route dans la vraie vie. Chaque pièce est choisie avec soin pour durer, et chaque commande est traitée comme si c'était la nôtre.</p>
+    <p>CHACHA SHOP VIP est né d'une envie simple : porter des couleurs vives, des matières solides, et un style qui tient la route dans la vraie vie. Chaque pièce est choisie avec soin pour durer, et chaque commande est traitée comme si c'était la nôtre.</p>
     <a href="#vetements" class="btn btn-primary">Voir tous les vêtements</a>
   </div>
   <div class="lookbook-images" data-reveal>
@@ -317,6 +315,26 @@
     </form>
     <p id="trackError" class="track-error" style="display:none;">Aucune commande trouvée avec ces informations. Vérifie le numéro de commande et le téléphone.</p>
     <div class="track-result" id="trackResult" style="display:none;"></div>
+  </div>
+</div>
+
+<!-- ===========================
+     PHOTO PRODUIT — vue zoom (façon Jumia)
+=========================== -->
+<div class="lightbox-overlay" id="lightboxOverlay">
+  <div class="lightbox-content">
+    <button class="close-btn lightbox-close" id="lightboxClose" aria-label="Fermer la photo">✕</button>
+    <div class="lightbox-zoom-wrap" id="lightboxZoomWrap">
+      <img id="lightboxImg" src="" alt="" draggable="false">
+    </div>
+    <p class="lightbox-hint">Touche/clique la photo pour zoomer, ou pince pour ajuster — glisse pour te déplacer</p>
+    <div class="lightbox-info">
+      <div>
+        <div class="lightbox-name" id="lightboxName"></div>
+        <div class="lightbox-price" id="lightboxPrice"></div>
+      </div>
+      <button class="btn btn-primary" id="lightboxAddBtn">Ajouter au panier</button>
+    </div>
   </div>
 </div>
 
