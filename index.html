@@ -61,17 +61,26 @@
   <div class="universe-grid" id="universeGrid"></div>
 </section>
 
-<!-- PAGE ALBUM D'UNE CATÉGORIE (ouverte au clic sur une catégorie, sans scroll) -->
+<!-- PAGE ALBUM D'UNE CATÉGORIE (ouverte au clic sur une catégorie, sans scroll).
+     Se ferme avec le bouton retour natif du navigateur/téléphone (historique) ou la croix. -->
 <div class="category-overlay" id="categoryOverlay">
   <div class="category-page">
     <div class="category-page-top">
-      <button type="button" class="category-back-btn" id="categoryBackBtn"><i class="fa-solid fa-arrow-left"></i> Retour</button>
       <h2 class="category-page-title" id="categoryPageTitle"></h2>
       <span class="category-page-count" id="categoryPageCount"></span>
+      <button type="button" class="close-btn" id="categoryCloseBtn" aria-label="Fermer"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <div class="product-grid" id="categoryPageGrid"></div>
   </div>
 </div>
+
+<section class="section" id="recemmentVus" hidden>
+  <div class="section-head" data-reveal>
+    <span class="section-eyebrow">Ton historique</span>
+    <h2 class="section-title">Articles récemment vus</h2>
+  </div>
+  <div class="product-grid" id="recentlyViewedGrid"></div>
+</section>
 
 <section class="values-strip">
   <div class="value-item"><i class="fa-solid fa-leaf" aria-hidden="true"></i> Matières de qualité</div>
