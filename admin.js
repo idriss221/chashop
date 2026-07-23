@@ -1,27 +1,16 @@
 // ===========================
-// CHACHA — Espace Admin (admin.js)
-// Page dédiée : admin.html. Utilise les données/fonctions de synchronisation
-// Firebase de common.js (chargé avant ce fichier). Tout ajout/suppression/
-// modification est écrit dans Firebase et apparaît automatiquement sur tous
-// les appareils connectés (boutique et admin), en temps réel.
+// CHACHA — Espace Admin
 // ===========================
 
 let allProducts = [];
 let allOrders = [];
+let productFilter = 'all';
+let orderFilter = 'all';
 
-let productFilter = 'all';   // all | shoe | cloth
-let orderFilter = 'all';     // all | nouvelle | preparation | livraison | livree ...
-
-// ===========================
-// Éléments principaux
-// ===========================
 const adminLoginScreen = document.getElementById('adminLoginScreen');
 const adminDashboard = document.getElementById('adminDashboard');
 const adminFormOverlay = document.getElementById('adminFormOverlay');
 
-// ===========================
-// Connexion / redirection
-// ===========================
 function showLoginScreen(){
   adminLoginScreen.hidden = false;
   adminLoginScreen.style.display = 'flex';
@@ -34,12 +23,7 @@ function showDashboard(){
   renderDashboard();
 }
 
-// Au chargement : si déjà connecté (session en cours), on va directement au tableau de bord.
-if(isAdminLoggedIn()){
-  showDashboard();
-} else {
-  showLoginScreen();
-}
+if(isAdminLoggedIn()){ showDashboard(); } else { showLoginScreen(); }
 
 document.getElementById('adminLoginForm').addEventListener('submit', (e)=>{
   e.preventDefault();
@@ -49,33 +33,25 @@ document.getElementById('adminLoginForm').addEventListener('submit', (e)=>{
     sessionStorage.setItem(ADMIN_SESSION_KEY, '1');
     document.getElementById('adminLoginForm').reset();
     errorEl.style.display = 'none';
-    // Redirection immédiate vers le tableau de bord, sur la même page.
     showDashboard();
   } else {
     errorEl.style.display = 'block';
   }
 });
-
 document.getElementById('adminLogoutBtn').addEventListener('click', ()=>{
   sessionStorage.removeItem(ADMIN_SESSION_KEY);
-  showToast('Déconnecté(e) de l\'espace admin');
+  showToast("Déconnecté(e) de l'espace admin");
   showLoginScreen();
 });
 
-// ===========================
-// Navigation par onglets (Produits / Commandes)
-// ===========================
 const adminNav = document.getElementById('adminNav');
 const panelProduits = document.getElementById('panelProduits');
 const panelCommandes = document.getElementById('panelCommandes');
-
 function switchAdminTab(tab){
   const isProduits = tab === 'produits';
   panelProduits.hidden = !isProduits;
   panelCommandes.hidden = isProduits;
-  adminNav.querySelectorAll('.admin-nav-btn').forEach(btn=>{
-    btn.classList.toggle('active', btn.dataset.tab === tab);
-  });
+  adminNav.querySelectorAll('.admin-nav-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tab));
   if(isProduits){ renderAdminProductList(); } else { renderAdminOrderList(); }
 }
 adminNav.addEventListener('click', (e)=>{
@@ -84,65 +60,41 @@ adminNav.addEventListener('click', (e)=>{
   switchAdminTab(btn.dataset.tab);
 });
 
-// ===========================
-// Rendu global du tableau de bord
-// ===========================
 function renderDashboard(){
   renderStats();
   renderAdminProductList();
   renderAdminOrderList();
   updateOrdersCountBadge();
 }
-
 function renderStats(){
   const totalProducts = allProducts.length;
   const totalOrders = allOrders.length;
   const newOrders = allOrders.filter(o => o.status === 'nouvelle').length;
-  const revenue = allOrders
-    .filter(o => o.status !== 'annulee')
-    .reduce((sum, o) => sum + (o.total || 0), 0);
-
+  const revenue = allOrders.filter(o => o.status !== 'annulee').reduce((sum, o) => sum + (o.total || 0), 0);
   const stats = [
-    { label:'Produits en ligne', value: totalProducts, icon:'👟' },
-    { label:'Commandes reçues', value: totalOrders, icon:'📦' },
-    { label:'Nouvelles commandes', value: newOrders, icon:'🔔', highlight: newOrders > 0 },
-    { label:'Chiffre d\'affaires estimé', value: formatFCFA(revenue), icon:'💰' }
+    { label:'Produits en ligne', value: totalProducts, icon:'fa-shoe-prints' },
+    { label:'Commandes reçues', value: totalOrders, icon:'fa-box' },
+    { label:'Nouvelles commandes', value: newOrders, icon:'fa-bell', highlight: newOrders > 0 },
+    { label:"Chiffre d'affaires estimé", value: formatFCFA(revenue), icon:'fa-sack-dollar' }
   ];
-
   document.getElementById('adminStatsRow').innerHTML = stats.map(s => `
     <div class="admin-stat-card ${s.highlight ? 'is-highlight' : ''}">
-      <span class="admin-stat-icon">${s.icon}</span>
-      <div>
-        <div class="admin-stat-value">${s.value}</div>
-        <div class="admin-stat-label">${s.label}</div>
-      </div>
-    </div>
-  `).join('');
+      <span class="admin-stat-icon"><i class="fa-solid ${s.icon}"></i></span>
+      <div><div class="admin-stat-value">${s.value}</div><div class="admin-stat-label">${s.label}</div></div>
+    </div>`).join('');
 }
-
 function updateOrdersCountBadge(){
   document.getElementById('ordersCountBadge').textContent = allOrders.length;
 }
 
-// ===========================
-// Synchronisation en temps réel (Firebase)
-// Dès qu'un produit ou une commande change — ajouté depuis CET appareil ou
-// depuis n'importe quel autre — le tableau de bord se met à jour tout seul.
-// ===========================
 subscribeToProducts((list)=>{
   allProducts = list;
-  if(!adminDashboard.hidden){
-    renderAdminProductList();
-    renderStats();
-  }
+  if(!adminDashboard.hidden){ renderAdminProductList(); renderStats(); }
 });
 subscribeToOrders((list)=>{
   allOrders = list;
   updateOrdersCountBadge();
-  if(!adminDashboard.hidden){
-    renderAdminOrderList();
-    renderStats();
-  }
+  if(!adminDashboard.hidden){ renderAdminOrderList(); renderStats(); }
 });
 
 // ===========================
@@ -160,7 +112,6 @@ productFilterRow.addEventListener('click', (e)=>{
 function renderAdminProductList(){
   const list = document.getElementById('adminProductList');
   const items = productFilter === 'all' ? allProducts : allProducts.filter(p => p.type === productFilter);
-
   if(items.length === 0){
     list.innerHTML = `<p class="admin-empty">Aucun produit ${productFilter !== 'all' ? 'dans cette catégorie ' : ''}pour le moment. Clique sur "+ Ajouter un produit" pour commencer.</p>`;
     return;
@@ -170,20 +121,18 @@ function renderAdminProductList(){
       <img src="${p.img}" alt="${p.name}">
       <div class="admin-product-info">
         <div class="admin-product-name">${p.name}</div>
-        <div class="admin-product-meta">${p.type === 'shoe' ? 'Chaussure' : 'Vêtement'} · ${p.cat} · ${formatFCFA(p.price)}${p.badge ? ' · ' + p.badge : ''}</div>
+        <div class="admin-product-meta">${p.type === 'shoe' ? 'Chaussure' : 'Vêtement'} · ${audienceLabel(p.audience || 'unisexe')} · ${p.cat} · ${formatFCFA(p.price)}${p.badge ? ' · ' + p.badge : ''}</div>
       </div>
       <div class="admin-product-actions">
-        <button class="admin-icon-btn" data-edit="${p.id}" aria-label="Modifier ${p.name}" title="Modifier">✏️</button>
-        <button class="admin-icon-btn danger" data-delete="${p.id}" aria-label="Supprimer ${p.name}" title="Supprimer">🗑️</button>
+        <button class="admin-icon-btn" data-edit="${p.id}" aria-label="Modifier ${p.name}" title="Modifier"><i class="fa-solid fa-pen"></i></button>
+        <button class="admin-icon-btn danger" data-delete="${p.id}" aria-label="Supprimer ${p.name}" title="Supprimer"><i class="fa-solid fa-trash"></i></button>
       </div>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
 document.getElementById('adminProductList').addEventListener('click', (e)=>{
   const editBtn = e.target.closest('[data-edit]');
   if(editBtn){ openAdminForm(editBtn.dataset.edit); return; }
-
   const delBtn = e.target.closest('[data-delete]');
   if(delBtn){
     const product = allProducts.find(p => p.id === delBtn.dataset.delete);
@@ -212,11 +161,14 @@ function openAdminForm(id){
     if(p){
       document.getElementById('adminName').value = p.name;
       document.getElementById('adminType').value = p.type;
+      document.getElementById('adminAudience').value = p.audience || 'unisexe';
       document.getElementById('adminCat').value = p.cat;
+      document.getElementById('adminDesc').value = p.desc || '';
       document.getElementById('adminPrice').value = p.price;
       document.getElementById('adminOldPrice').value = p.old || '';
       document.getElementById('adminBadge').value = p.badge || '';
       document.getElementById('adminColors').value = (p.colors || []).join(',');
+      document.getElementById('adminImages').value = (p.images || []).join(',');
 
       if(p.img && p.img.startsWith('data:')){
         adminUploadedImage = p.img;
@@ -230,11 +182,7 @@ function openAdminForm(id){
   adminFormOverlay.classList.add('open');
 }
 
-// ===========================
-// Téléversement de photo produit (compression côté navigateur)
-// ===========================
 let adminUploadedImage = null;
-
 const adminUploadZone = document.getElementById('adminUploadZone');
 const adminImgFile = document.getElementById('adminImgFile');
 const adminImgPreview = document.getElementById('adminImgPreview');
@@ -242,33 +190,27 @@ const adminUploadPlaceholder = document.getElementById('adminUploadPlaceholder')
 const adminRemoveImgBtn = document.getElementById('adminRemoveImg');
 
 adminUploadZone.addEventListener('click', ()=> adminImgFile.click());
-
 adminImgFile.addEventListener('change', async (e)=>{
   const file = e.target.files[0];
   if(!file) return;
-  if(!file.type.startsWith('image/')){
-    showToast('Merci de choisir un fichier image');
-    return;
-  }
+  if(!file.type.startsWith('image/')){ showToast('Merci de choisir un fichier image'); return; }
   try{
-    adminUploadPlaceholder.innerHTML = `<span class="admin-upload-icon">⏳</span><span>Traitement de l'image…</span>`;
+    adminUploadPlaceholder.innerHTML = `<i class="fa-solid fa-spinner fa-spin admin-upload-icon"></i><span>Traitement de l'image…</span>`;
     const dataUrl = await compressImageFile(file, 1000, 0.82);
     adminUploadedImage = dataUrl;
     document.getElementById('adminImg').value = '';
     showAdminImagePreview(dataUrl);
   }catch(err){
-    showToast("Impossible de lire cette image, réessaie avec un autre fichier");
+    showToast('Impossible de lire cette image, réessaie avec un autre fichier');
     resetAdminImagePreview();
   }
 });
-
 adminRemoveImgBtn.addEventListener('click', (e)=>{
   e.stopPropagation();
   adminUploadedImage = null;
   adminImgFile.value = '';
   resetAdminImagePreview();
 });
-
 function showAdminImagePreview(dataUrl){
   adminImgPreview.src = dataUrl;
   adminImgPreview.style.display = 'block';
@@ -278,11 +220,10 @@ function showAdminImagePreview(dataUrl){
 function resetAdminImagePreview(){
   adminImgPreview.src = '';
   adminImgPreview.style.display = 'none';
-  adminUploadPlaceholder.innerHTML = `<span class="admin-upload-icon">📷</span><span>Clique pour choisir une photo</span><span class="admin-upload-hint">JPG, PNG ou WEBP</span>`;
+  adminUploadPlaceholder.innerHTML = `<i class="fa-solid fa-camera admin-upload-icon"></i><span>Clique pour choisir une photo</span><span class="admin-upload-hint">JPG, PNG ou WEBP</span>`;
   adminUploadPlaceholder.style.display = 'flex';
   adminRemoveImgBtn.style.display = 'none';
 }
-
 function compressImageFile(file, maxWidth, quality){
   return new Promise((resolve, reject)=>{
     const reader = new FileReader();
@@ -307,26 +248,20 @@ function compressImageFile(file, maxWidth, quality){
 
 document.getElementById('closeAdminForm').addEventListener('click', ()=> adminFormOverlay.classList.remove('open'));
 document.getElementById('cancelAdminForm').addEventListener('click', ()=> adminFormOverlay.classList.remove('open'));
-adminFormOverlay.addEventListener('click', (e)=>{
-  if(e.target === adminFormOverlay) adminFormOverlay.classList.remove('open');
-});
+adminFormOverlay.addEventListener('click', (e)=>{ if(e.target === adminFormOverlay) adminFormOverlay.classList.remove('open'); });
 
 document.getElementById('adminProductForm').addEventListener('submit', (e)=>{
   e.preventDefault();
-
   const id = document.getElementById('adminProductId').value;
   const colorsRaw = document.getElementById('adminColors').value.trim();
-  const colors = colorsRaw
-    ? colorsRaw.split(',').map(c => c.trim()).filter(Boolean)
-    : ['#1C1C1C'];
+  const colors = colorsRaw ? colorsRaw.split(',').map(c => c.trim()).filter(Boolean) : ['#1C1C1C'];
+  const imagesRaw = document.getElementById('adminImages').value.trim();
+  const images = imagesRaw ? imagesRaw.split(',').map(u => u.trim()).filter(Boolean) : [];
   const oldVal = document.getElementById('adminOldPrice').value;
   const urlVal = document.getElementById('adminImg').value.trim();
   const finalImg = adminUploadedImage || urlVal;
 
-  if(!finalImg){
-    showToast('Ajoute une photo ou une URL d\'image pour ce produit');
-    return;
-  }
+  if(!finalImg){ showToast("Ajoute une photo ou une URL d'image pour ce produit"); return; }
 
   const existing = id ? allProducts.find(p => p.id === id) : null;
   const finalProduct = {
@@ -334,11 +269,14 @@ document.getElementById('adminProductForm').addEventListener('submit', (e)=>{
     id: id || genId(),
     name: document.getElementById('adminName').value.trim(),
     type: document.getElementById('adminType').value,
+    audience: document.getElementById('adminAudience').value,
     cat: document.getElementById('adminCat').value.trim(),
+    desc: document.getElementById('adminDesc').value.trim() || null,
     price: parseInt(document.getElementById('adminPrice').value, 10) || 0,
     old: oldVal ? (parseInt(oldVal, 10) || null) : null,
     badge: document.getElementById('adminBadge').value || null,
     img: finalImg,
+    images,
     colors
   };
 
@@ -349,11 +287,8 @@ document.getElementById('adminProductForm').addEventListener('submit', (e)=>{
   saveProductRemote(finalProduct).then(()=>{
     showToast(id ? 'Produit mis à jour sur tous les appareils' : 'Produit ajouté sur tous les appareils');
     adminFormOverlay.classList.remove('open');
-    // Pas besoin de re-render manuellement : la synchronisation en temps
-    // réel (subscribeToProducts) met déjà le tableau de bord à jour, ici et
-    // sur tous les autres appareils.
   }).catch(()=>{
-    showToast('Erreur réseau — impossible d\'enregistrer ce produit, réessaie');
+    showToast("Erreur réseau — impossible d'enregistrer ce produit, réessaie");
   }).finally(()=>{
     submitBtn.disabled = false;
     submitBtn.textContent = 'Enregistrer';
@@ -376,7 +311,6 @@ function renderAdminOrderList(){
   const list = document.getElementById('adminOrderList');
   if(!list) return;
   updateOrdersCountBadge();
-
   const items = orderFilter === 'all' ? allOrders : allOrders.filter(o => o.status === orderFilter);
 
   if(allOrders.length === 0){
@@ -390,10 +324,13 @@ function renderAdminOrderList(){
 
   list.innerHTML = items.map(order => {
     const meta = getStatusMeta(order.status);
-    const itemsList = order.items.map(i => `<div>${i.name} ×${i.qty} — ${formatFCFA(i.lineTotal)}</div>`).join('');
-    const statusOptions = ORDER_STATUSES.map(s =>
-      `<option value="${s.key}" ${s.key === order.status ? 'selected' : ''}>${s.label}</option>`
-    ).join('');
+    const itemsList = order.items.map(i => `
+      <div class="admin-order-item-row">
+        <img src="${i.img || ''}" alt="${i.name}">
+        <span class="admin-order-item-name">${i.name}${i.size ? ' · '+i.size : ''} ×${i.qty}</span>
+        <span>${formatFCFA(i.lineTotal)}</span>
+      </div>`).join('');
+    const statusOptions = ORDER_STATUSES.map(s => `<option value="${s.key}" ${s.key === order.status ? 'selected' : ''}>${s.label}</option>`).join('');
 
     return `
     <div class="admin-order-card" data-order-id="${order.id}">
@@ -405,12 +342,15 @@ function renderAdminOrderList(){
         <span class="admin-order-status-pill" style="background:${meta.color}22;color:${meta.color};">${meta.label}</span>
       </div>
       <div class="admin-order-client">${order.fullName} — ${order.phone}</div>
-      <div class="admin-order-meta">📍 ${order.addressDetails}, ${order.neighborhood}, ${order.city}${order.addressNote ? `<br>📝 ${order.addressNote}` : ''}</div>
+      <div class="admin-order-meta">
+        <span><i class="fa-solid fa-location-dot"></i> ${order.addressDetails}, ${order.neighborhood}, ${order.city}</span>
+        ${order.addressNote ? `<span><i class="fa-solid fa-note-sticky"></i> ${order.addressNote}</span>` : ''}
+      </div>
       <div class="admin-order-items">${itemsList}</div>
       <div class="admin-order-total">Total : ${formatFCFA(order.total)}</div>
       <div class="admin-order-actions">
         <select data-status-select="${order.id}" aria-label="Changer le statut de la commande">${statusOptions}</select>
-        <button type="button" class="btn btn-whatsapp" data-contact="${order.id}">Contacter</button>
+        <button type="button" class="btn btn-whatsapp" data-contact="${order.id}"><i class="fa-brands fa-whatsapp"></i> Contacter</button>
       </div>
     </div>`;
   }).join('');
@@ -434,9 +374,8 @@ document.getElementById('adminOrderList').addEventListener('click', (e)=>{
   if(!contactBtn) return;
   const order = allOrders.find(o => o.id === contactBtn.dataset.contact);
   if(!order) return;
-
   const lines = [
-    `Bonjour ${order.fullName} 👋, ici CHACHA SHOP VIP.`,
+    `Bonjour ${order.fullName}, ici CHACHA SHOP VIP.`,
     `Je vous contacte au sujet de votre commande #${order.id} (${formatFCFA(order.total)}) pour finaliser le paiement et organiser la livraison.`
   ];
   const msg = encodeURIComponent(lines.join('\n'));
@@ -444,9 +383,6 @@ document.getElementById('adminOrderList').addEventListener('click', (e)=>{
   window.open(url, '_blank');
 });
 
-// ===========================
-// Toast
-// ===========================
 const toastEl = document.getElementById('toast');
 let toastTimer = null;
 function showToast(msg){

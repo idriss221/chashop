@@ -6,12 +6,12 @@
 <title>CHACHA — Mode &amp; Sneakers</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,800&family=Manrope:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<!-- Préchargeur -->
 <div class="preloader" id="preloader">
   <div class="preloader-inner">
     <div class="preloader-logo">CHACHA</div>
@@ -19,74 +19,67 @@
   </div>
 </div>
 
-<!-- Bandeau ticker -->
-<div class="ticker-wrap">
-  <div class="ticker">
-    <span>🚚 LIVRAISON À DAKAR EN 24H &nbsp;•&nbsp; 📦 SUIVEZ VOTRE COMMANDE EN LIGNE &nbsp;•&nbsp; 🔥 NOUVELLE COLLECTION DISPONIBLE &nbsp;•&nbsp; 🚚 LIVRAISON À DAKAR EN 24H &nbsp;•&nbsp; 📦 SUIVEZ VOTRE COMMANDE EN LIGNE &nbsp;•&nbsp; 🔥 NOUVELLE COLLECTION DISPONIBLE &nbsp;•&nbsp;</span>
-    <span>🚚 LIVRAISON À DAKAR EN 24H &nbsp;•&nbsp; 📦 SUIVEZ VOTRE COMMANDE EN LIGNE &nbsp;•&nbsp; 🔥 NOUVELLE COLLECTION DISPONIBLE &nbsp;•&nbsp; 🚚 LIVRAISON À DAKAR EN 24H &nbsp;•&nbsp; 📦 SUIVEZ VOTRE COMMANDE EN LIGNE &nbsp;•&nbsp; 🔥 NOUVELLE COLLECTION DISPONIBLE &nbsp;•&nbsp;</span>
-  </div>
-</div>
-
-<!-- Header -->
 <header class="header" id="header">
   <div class="header-inner">
-    <a href="#" class="logo">CHACHA SHOP VIP<span class="logo-dot">.</span></a>
-    <nav class="nav">
-      <a href="#nouveautes">Nouveautés</a>
-      <a href="#chaussures">Chaussures</a>
-      <a href="#vetements">Vêtements</a>
-      <a href="#about">Notre histoire</a>
+    <a href="#" class="logo" id="navHomeBtn">CHACHA SHOP VIP<span class="logo-dot">.</span></a>
+
+    <button class="nav-toggle" id="navToggle" aria-label="Ouvrir le menu" aria-expanded="false">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+
+    <nav class="nav" id="mainNav">
+      <a href="#univers"><i class="fa-solid fa-grip"></i> Catégories</a>
+      <a href="#" id="navSearchBtn"><i class="fa-solid fa-magnifying-glass"></i> Recherche</a>
+      <a href="#" id="navTrackBtn"><i class="fa-solid fa-truck-fast"></i> Suivre ma commande</a>
     </nav>
+
     <div class="header-actions">
-      <button type="button" class="track-link-btn" id="trackOpenBtn">Suivre ma commande</button>
-      <a href="admin.html" class="admin-link-btn" id="adminOpenBtn">Admin</a>
+      <a href="admin.html" class="admin-link-btn" aria-label="Espace admin"><i class="fa-solid fa-user-shield"></i></a>
       <button class="icon-btn cart-btn" aria-label="Voir le panier" id="cartBtn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        <i class="fa-solid fa-bag-shopping"></i>
         <span class="cart-count" id="cartCount">0</span>
       </button>
     </div>
   </div>
+
+  <div class="search-panel" id="searchPanel">
+    <div class="search-panel-inner">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" id="searchInput" placeholder="Rechercher un produit… (ex : Hoodie, ZENITH, sneaker)">
+      <button class="close-btn" id="closeSearch" aria-label="Fermer la recherche"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="search-results" id="searchResults"></div>
+  </div>
 </header>
 
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-grid">
-    <div class="hero-copy" data-reveal>
-      <p class="hero-eyebrow">Nouvelle collection — Dakar Edition</p>
-      <h1 class="hero-title">
-        <span class="line">VIS</span>
-        <span class="line accent">COLORÉ.</span>
-      </h1>
-      <p class="hero-sub">Sneakers et vêtements pensés pour la rue, les couleurs et le mouvement. Commande en quelques clics, on te contacte pour finaliser, et tu reçois chez toi.</p>
-      <div class="hero-cta-row">
-        <a href="#chaussures" class="btn btn-primary">Voir les chaussures</a>
-        <a href="#vetements" class="btn btn-ghost">Voir les vêtements</a>
-      </div>
-      <div class="hero-stats">
-        <div><strong>2 500+</strong><span>Clients satisfaits</span></div>
-        <div><strong>24h</strong><span>Livraison Dakar</span></div>
-        <div><strong>100%</strong><span>Commande suivie</span></div>
-      </div>
-    </div>
-    <div class="hero-visual" data-reveal>
-      <div class="hero-image-frame">
-        <img src="https://images.unsplash.com/photo-1605408499391-6368c628ef42?q=80&w=1200&auto=format&fit=crop" alt="Sneaker phare de la collection" id="heroImg">
-      </div>
-      <div class="hero-tag tag-price">25 000 FCFA</div>
-      <div class="hero-tag tag-name">ZENITH / Mangue</div>
-    </div>
+<section class="universe-section" id="univers">
+  <div class="universe-head" data-reveal>
+    <span class="universe-eyebrow">Dakar Edition</span>
+    <h1 class="universe-title">Choisis ton univers.</h1>
+    <p class="universe-sub">Touche une catégorie pour entrer directement dans la sélection.</p>
   </div>
+  <div class="universe-grid" id="universeGrid"></div>
 </section>
 
-<!-- Marquee marques / valeurs -->
+<!-- PAGE ALBUM D'UNE CATÉGORIE (ouverte au clic sur une catégorie, sans scroll) -->
+<div class="category-overlay" id="categoryOverlay">
+  <div class="category-page">
+    <div class="category-page-top">
+      <button type="button" class="category-back-btn" id="categoryBackBtn"><i class="fa-solid fa-arrow-left"></i> Retour</button>
+      <h2 class="category-page-title" id="categoryPageTitle"></h2>
+      <span class="category-page-count" id="categoryPageCount"></span>
+    </div>
+    <div class="product-grid" id="categoryPageGrid"></div>
+  </div>
+</div>
+
 <section class="values-strip">
-  <div class="value-item"><span class="value-emoji">🌿</span> Matières de qualité</div>
-  <div class="value-item"><span class="value-emoji">⚡</span> Expédié en 24-48h</div>
-  <div class="value-item"><span class="value-emoji">✅</span> Qualité garantie</div>
-  <div class="value-item"><span class="value-emoji">📞</span> Paiement finalisé par téléphone</div>
+  <div class="value-item"><i class="fa-solid fa-leaf" aria-hidden="true"></i> Matières de qualité</div>
+  <div class="value-item"><i class="fa-solid fa-bolt" aria-hidden="true"></i> Expédié en 24-48h</div>
+  <div class="value-item"><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Qualité garantie</div>
+  <div class="value-item"><i class="fa-solid fa-phone" aria-hidden="true"></i> Paiement finalisé par téléphone</div>
 </section>
 
-<!-- NOUVEAUTÉS -->
 <section class="section" id="nouveautes">
   <div class="section-head" data-reveal>
     <span class="section-eyebrow">Tendance du moment</span>
@@ -95,15 +88,24 @@
   <div class="product-grid" id="newArrivals"></div>
 </section>
 
-<!-- BANDEAU SIGNATURE -->
-<section class="signature-band">
-  <div class="signature-content" data-reveal>
-    <h2>COMMANDE. ON TE CONTACTE. TU REÇOIS CHEZ TOI.</h2>
-    <p>Choisis tes articles, indique ton adresse, et valide ta commande. Notre équipe t'appelle ou t'écrit rapidement pour confirmer et organiser le paiement en toute confiance.</p>
+<section class="section section-alt" id="categories">
+  <div class="section-head" data-reveal>
+    <span class="section-eyebrow">Parcourir</span>
+    <h2 class="section-title">Toutes les catégories</h2>
+  </div>
+  <div class="category-chip-row" id="categoryChipRow"></div>
+  <div class="sort-row">
+    <div class="sort-dropdown">
+      <button type="button" class="sort-btn" id="priceSortBtn"><i class="fa-solid fa-sliders"></i> <span id="priceSortLabel">Filtrer par prix</span> <i class="fa-solid fa-chevron-down sort-chevron"></i></button>
+      <div class="sort-menu" id="priceSortMenu">
+        <button type="button" class="sort-option" data-sort="default">Par défaut</button>
+        <button type="button" class="sort-option" data-sort="asc">Prix croissant</button>
+        <button type="button" class="sort-option" data-sort="desc">Prix décroissant</button>
+      </div>
+    </div>
   </div>
 </section>
 
-<!-- CHAUSSURES -->
 <section class="section section-alt" id="chaussures">
   <div class="section-head" data-reveal>
     <span class="section-eyebrow">Notre sélection</span>
@@ -112,21 +114,6 @@
   <div class="product-grid" id="shoesGrid"></div>
 </section>
 
-<!-- LOOKBOOK -->
-<section class="lookbook" id="about">
-  <div class="lookbook-text" data-reveal>
-    <span class="section-eyebrow">Notre histoire</span>
-    <h2 class="section-title">Une mode qui nous ressemble vraiment</h2>
-    <p>CHACHA SHOP VIP est né d'une envie simple : porter des couleurs vives, des matières solides, et un style qui tient la route dans la vraie vie. Chaque pièce est choisie avec soin pour durer, et chaque commande est traitée comme si c'était la nôtre.</p>
-    <a href="#vetements" class="btn btn-primary">Voir tous les vêtements</a>
-  </div>
-  <div class="lookbook-images" data-reveal>
-    <img src="https://images.unsplash.com/photo-1490367532201-b9bc1dc483f6?q=80&w=900&auto=format&fit=crop" alt="Look coloré 1" class="lk lk-1">
-    <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=900&auto=format&fit=crop" alt="Look coloré 2" class="lk lk-2">
-  </div>
-</section>
-
-<!-- VÊTEMENTS -->
 <section class="section" id="vetements">
   <div class="section-head" data-reveal>
     <span class="section-eyebrow">Notre sélection</span>
@@ -135,17 +122,14 @@
   <div class="product-grid" id="clothesGrid"></div>
 </section>
 
-<!-- BANDEAU SUIVI DE COMMANDE -->
-<section class="track-trust">
-  <div class="track-trust-inner" data-reveal>
-    <div class="track-trust-icon">📦</div>
-    <h2>Suis ta commande à chaque étape</h2>
-    <p>Dès que tu valides ta commande, tu reçois un numéro de suivi. Notre équipe te contacte pour finaliser le paiement, et tu peux suivre l'avancement — reçue, en préparation, en livraison — directement ici.</p>
-    <button type="button" class="btn btn-primary" id="trackOpenBtn2">Suivre ma commande</button>
+<section class="section section-alt" id="promotions">
+  <div class="section-head" data-reveal>
+    <span class="section-eyebrow">À ne pas manquer</span>
+    <h2 class="section-title">Promotions en cours</h2>
   </div>
+  <div class="product-grid" id="promoGrid"></div>
 </section>
 
-<!-- FOOTER -->
 <footer class="footer">
   <div class="footer-top">
     <div class="footer-brand">
@@ -157,43 +141,40 @@
       <a href="#chaussures">Chaussures</a>
       <a href="#vetements">Vêtements</a>
       <a href="#nouveautes">Nouveautés</a>
+      <a href="#promotions">Promotions</a>
     </div>
     <div class="footer-col">
       <h4>Aide</h4>
-      <a href="#" id="footerWhatsapp">Commander sur WhatsApp</a>
-      <a href="#">Livraison</a>
-      <a href="#" id="footerTrackLink">Suivi de commande</a>
+      <a href="#" id="footerWhatsapp"><i class="fa-brands fa-whatsapp"></i> Commander sur WhatsApp</a>
+      <a href="#"><i class="fa-solid fa-truck"></i> Livraison</a>
+      <a href="#" id="footerTrackLink"><i class="fa-solid fa-magnifying-glass-location"></i> Suivi de commande</a>
     </div>
     <div class="footer-col">
       <h4>Contact</h4>
-      <a href="#">📞 +221 77 176 70 71</a>
-      <a href="#">📍 Dakar, Sénégal</a>
+      <a href="#"><i class="fa-solid fa-phone"></i> +221 77 176 70 71</a>
+      <a href="#"><i class="fa-solid fa-location-dot"></i> Dakar, Sénégal</a>
     </div>
   </div>
   <div class="footer-bottom">
     <span>© 2026 CHACHA. Tous droits réservés.</span>
-    <span>Fait avec ❤️ au Sénégal</span>
+    <span>Fait au Sénégal</span>
   </div>
 </footer>
 
-<!-- Bouton flottant WhatsApp -->
 <a href="#" class="whatsapp-float" id="whatsappFloat" aria-label="Contacter sur WhatsApp" target="_blank" rel="noopener">
-  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.6 6.32A8.86 8.86 0 0 0 12.05 4 8.94 8.94 0 0 0 4 17.9L2.6 22l4.2-1.34a8.87 8.87 0 0 0 5.25 1.7h0a8.94 8.94 0 0 0 8.94-9 8.85 8.85 0 0 0-3.39-6.04zM12.05 20.5a7.4 7.4 0 0 1-3.78-1.04l-.27-.16-2.83.9.91-2.76-.18-.28a7.42 7.42 0 0 1 11.4-9.32 7.34 7.34 0 0 1 2.18 5.24 7.42 7.42 0 0 1-7.43 7.42zm4.07-5.56c-.22-.11-1.3-.64-1.5-.72-.2-.07-.35-.11-.5.11-.14.22-.57.72-.7.86-.13.15-.26.16-.48.05-.22-.11-.93-.34-1.77-1.1-.65-.58-1.1-1.3-1.22-1.52-.13-.22-.01-.34.11-.45.11-.11.25-.28.37-.42.13-.14.17-.24.26-.4.08-.16.04-.3-.03-.42-.07-.11-.6-1.45-.82-1.98-.22-.51-.44-.45-.61-.46h-.52c-.18 0-.45.07-.62.25-.17.18-.65.64-.65 1.55s.66 1.8.75 1.93c.09.13 1.27 2 3.1 2.8 1.83.8 1.83.53 2.16.5.33-.03 1.06-.43 1.21-.85.15-.42.15-.78.1-.86-.05-.07-.18-.11-.4-.21z"/></svg>
+  <i class="fa-brands fa-whatsapp"></i>
   Commander
 </a>
 
-<!-- ===========================
-     PANIER (drawer latéral)
-=========================== -->
 <div class="overlay" id="overlay"></div>
 <aside class="cart-drawer" id="cartDrawer">
   <div class="cart-drawer-head">
     <h3>Ton panier</h3>
-    <button class="close-btn" id="closeCart" aria-label="Fermer le panier">✕</button>
+    <button class="close-btn" id="closeCart" aria-label="Fermer le panier"><i class="fa-solid fa-xmark"></i></button>
   </div>
   <div class="cart-items" id="cartItems"></div>
   <div class="cart-empty" id="cartEmpty">
-    <span class="cart-empty-emoji">🛍️</span>
+    <i class="fa-solid fa-bag-shopping" aria-hidden="true"></i>
     <p>Ton panier est vide pour le moment.</p>
     <button class="btn btn-primary" id="emptyShopBtn">Voir les produits</button>
   </div>
@@ -206,72 +187,37 @@
   </div>
 </aside>
 
-<!-- ===========================
-     TUNNEL DE COMMANDE (modal) — sans paiement en ligne
-=========================== -->
 <div class="checkout-overlay" id="checkoutOverlay">
   <div class="checkout-modal">
-    <button class="close-btn checkout-close" id="closeCheckout" aria-label="Fermer">✕</button>
+    <button class="close-btn checkout-close" id="closeCheckout" aria-label="Fermer"><i class="fa-solid fa-xmark"></i></button>
 
-    <!-- Barre de progression -->
     <div class="delivery-progress">
-      <div class="dp-track">
-        <div class="dp-fill" id="dpFill"></div>
-      </div>
+      <div class="dp-track"><div class="dp-fill" id="dpFill"></div></div>
       <div class="dp-stations">
-        <div class="dp-station active" data-step="1">
-          <span class="dp-dot">🛒</span><span class="dp-label">Panier</span>
-        </div>
-        <div class="dp-station" data-step="2">
-          <span class="dp-dot">📍</span><span class="dp-label">Adresse</span>
-        </div>
-        <div class="dp-station" data-step="3">
-          <span class="dp-dot">✅</span><span class="dp-label">Confirmée</span>
-        </div>
+        <div class="dp-station active" data-step="1"><span class="dp-dot"><i class="fa-solid fa-cart-shopping"></i></span><span class="dp-label">Panier</span></div>
+        <div class="dp-station" data-step="2"><span class="dp-dot"><i class="fa-solid fa-location-dot"></i></span><span class="dp-label">Adresse</span></div>
+        <div class="dp-station" data-step="3"><span class="dp-dot"><i class="fa-solid fa-check"></i></span><span class="dp-label">Confirmée</span></div>
       </div>
     </div>
 
-    <!-- Étape 1 : récap panier -->
     <div class="checkout-step" id="step1">
       <h3>Récapitule ta commande</h3>
       <div class="checkout-summary" id="checkoutSummary"></div>
-      <div class="checkout-total-row">
-        <span>Total estimé</span>
-        <strong id="checkoutTotal">0 FCFA</strong>
-      </div>
+      <div class="checkout-total-row"><span>Total estimé</span><strong id="checkoutTotal">0 FCFA</strong></div>
       <p class="step-hint">Aucun paiement en ligne : notre équipe te contacte juste après pour confirmer et organiser le règlement.</p>
       <button class="btn btn-primary btn-full" id="toStep2">Continuer vers l'adresse</button>
     </div>
 
-    <!-- Étape 2 : adresse -->
     <div class="checkout-step" id="step2" hidden>
       <h3>Où devons-nous livrer ?</h3>
       <p class="step-hint">Cette adresse confirme ta commande. Sois aussi précis(e) que possible — c'est aussi le numéro qu'on utilisera pour te contacter.</p>
       <form id="addressForm" class="checkout-form">
-        <div class="form-row">
-          <label for="fullName">Nom complet *</label>
-          <input type="text" id="fullName" required placeholder="Ex : Awa Diop">
-        </div>
-        <div class="form-row">
-          <label for="phone">Téléphone *</label>
-          <input type="tel" id="phone" required placeholder="Ex : 77 123 45 67">
-        </div>
-        <div class="form-row">
-          <label for="city">Ville *</label>
-          <input type="text" id="city" required placeholder="Ex : Dakar">
-        </div>
-        <div class="form-row">
-          <label for="neighborhood">Quartier / Zone *</label>
-          <input type="text" id="neighborhood" required placeholder="Ex : Sacré-Cœur 3">
-        </div>
-        <div class="form-row">
-          <label for="addressDetails">Adresse précise (rue, repère) *</label>
-          <textarea id="addressDetails" required placeholder="Ex : Villa n°12, en face de la pharmacie, près du carrefour"></textarea>
-        </div>
-        <div class="form-row">
-          <label for="addressNote">Note pour le livreur (optionnel)</label>
-          <input type="text" id="addressNote" placeholder="Ex : Appeler avant d'arriver">
-        </div>
+        <div class="form-row"><label for="fullName">Nom complet *</label><input type="text" id="fullName" required placeholder="Ex : Awa Diop"></div>
+        <div class="form-row"><label for="phone">Téléphone *</label><input type="tel" id="phone" required placeholder="Ex : 77 123 45 67"></div>
+        <div class="form-row"><label for="city">Ville *</label><input type="text" id="city" required placeholder="Ex : Dakar"></div>
+        <div class="form-row"><label for="neighborhood">Quartier / Zone *</label><input type="text" id="neighborhood" required placeholder="Ex : Sacré-Cœur 3"></div>
+        <div class="form-row"><label for="addressDetails">Adresse précise (rue, repère) *</label><textarea id="addressDetails" required placeholder="Ex : Villa n°12, en face de la pharmacie"></textarea></div>
+        <div class="form-row"><label for="addressNote">Note pour le livreur (optionnel)</label><input type="text" id="addressNote" placeholder="Ex : Appeler avant d'arriver"></div>
         <div class="form-actions">
           <button type="button" class="btn btn-ghost" id="backToStep1">Retour</button>
           <button type="submit" class="btn btn-primary">Valider ma commande</button>
@@ -279,39 +225,28 @@
       </form>
     </div>
 
-    <!-- Étape 3 : confirmation -->
     <div class="checkout-step" id="step3" hidden>
       <div class="confirm-box">
-        <div class="confirm-emoji">🎉</div>
+        <i class="fa-solid fa-circle-check confirm-emoji" aria-hidden="true"></i>
         <h3>Commande enregistrée !</h3>
         <p>Merci <strong id="confirmName"></strong> ! Ta commande <strong id="confirmOrderId"></strong> a bien été enregistrée. Notre équipe te contacte très vite au numéro indiqué pour confirmer et finaliser le paiement.</p>
         <div class="confirm-recap" id="confirmRecap"></div>
         <p class="step-hint">Garde ce numéro de commande précieusement : il te permet de suivre l'avancement via « Suivre ma commande ».</p>
-        <button class="btn btn-whatsapp btn-full" id="sendWhatsappBtn">Envoyer le récap sur WhatsApp</button>
+        <button class="btn btn-whatsapp btn-full" id="sendWhatsappBtn"><i class="fa-brands fa-whatsapp"></i> Envoyer le récap sur WhatsApp</button>
         <button class="btn btn-ghost btn-full" id="closeConfirm">Continuer mes achats</button>
       </div>
     </div>
-
   </div>
 </div>
 
-<!-- ===========================
-     SUIVI DE COMMANDE (client)
-=========================== -->
 <div class="checkout-overlay" id="trackOverlay">
   <div class="checkout-modal" style="max-width:480px;">
-    <button class="close-btn checkout-close" id="closeTrack" aria-label="Fermer">✕</button>
+    <button class="close-btn checkout-close" id="closeTrack" aria-label="Fermer"><i class="fa-solid fa-xmark"></i></button>
     <h3 style="font-family:var(--font-display);font-size:1.3rem;margin-bottom:6px;">Suivre ma commande</h3>
     <p class="step-hint">Renseigne le numéro de commande et le téléphone utilisés lors de la commande.</p>
     <form id="trackForm" class="checkout-form">
-      <div class="form-row">
-        <label for="trackOrderId">Numéro de commande *</label>
-        <input type="text" id="trackOrderId" required placeholder="Ex : CHACHA-482913">
-      </div>
-      <div class="form-row">
-        <label for="trackPhone">Téléphone utilisé *</label>
-        <input type="tel" id="trackPhone" required placeholder="Ex : 77 123 45 67">
-      </div>
+      <div class="form-row"><label for="trackOrderId">Numéro de commande *</label><input type="text" id="trackOrderId" required placeholder="Ex : CHACHA-482913"></div>
+      <div class="form-row"><label for="trackPhone">Téléphone utilisé *</label><input type="tel" id="trackPhone" required placeholder="Ex : 77 123 45 67"></div>
       <button type="submit" class="btn btn-primary btn-full">Voir l'avancement</button>
     </form>
     <p id="trackError" class="track-error" style="display:none;">Aucune commande trouvée avec ces informations. Vérifie le numéro de commande et le téléphone.</p>
@@ -319,27 +254,69 @@
   </div>
 </div>
 
-<!-- ===========================
-     PHOTO PRODUIT — vue zoom (façon Jumia)
-=========================== -->
-<div class="lightbox-overlay" id="lightboxOverlay">
-  <div class="lightbox-content">
-    <button class="close-btn lightbox-close" id="lightboxClose" aria-label="Fermer la photo">✕</button>
-    <div class="lightbox-zoom-wrap" id="lightboxZoomWrap">
-      <img id="lightboxImg" src="" alt="" draggable="false">
-    </div>
-    <p class="lightbox-hint">Touche/clique la photo pour zoomer, ou pince pour ajuster — glisse pour te déplacer</p>
-    <div class="lightbox-info">
+<!-- PAGE DÉTAIL PRODUIT -->
+<div class="product-overlay" id="productOverlay">
+  <div class="product-modal">
+    <button class="close-btn product-modal-close" id="closeProductDetail" aria-label="Fermer"><i class="fa-solid fa-xmark"></i></button>
+    <div class="product-detail-grid">
       <div>
-        <div class="lightbox-name" id="lightboxName"></div>
-        <div class="lightbox-price" id="lightboxPrice"></div>
+        <div class="pd-media-main" id="pdMediaMain">
+          <img id="pdMainImg" src="" alt="">
+        </div>
+        <div class="pd-thumbs" id="pdThumbs"></div>
       </div>
-      <button class="btn btn-primary" id="lightboxAddBtn">Ajouter au panier</button>
+      <div>
+        <span class="pd-cat" id="pdCat"></span>
+        <h2 class="pd-name" id="pdName"></h2>
+        <div class="pd-price-row">
+          <span class="pd-price" id="pdPrice"></span>
+          <span class="pd-old-price" id="pdOldPrice"></span>
+          <span class="pd-discount" id="pdDiscount"></span>
+        </div>
+        <div class="pd-availability" id="pdAvailability"><i class="fa-solid fa-circle-check"></i> En stock</div>
+        <p class="pd-desc" id="pdDesc"></p>
+
+        <div class="pd-option-block" id="pdSizeBlock">
+          <span class="pd-option-label">Taille</span>
+          <div class="pd-sizes" id="pdSizes"></div>
+        </div>
+        <div class="pd-option-block" id="pdColorBlock">
+          <span class="pd-option-label">Couleur</span>
+          <div class="pd-colors" id="pdColors"></div>
+        </div>
+        <div class="pd-option-block">
+          <span class="pd-option-label">Quantité</span>
+          <div class="pd-qty-control">
+            <button type="button" id="pdQtyDown"><i class="fa-solid fa-minus"></i></button>
+            <span id="pdQty">1</span>
+            <button type="button" id="pdQtyUp"><i class="fa-solid fa-plus"></i></button>
+          </div>
+        </div>
+
+        <div class="pd-actions">
+          <button class="btn btn-primary" id="pdAddToCart"><i class="fa-solid fa-bag-shopping"></i> Ajouter au panier</button>
+          <button class="btn btn-ghost" id="pdBuyNow"><i class="fa-solid fa-bolt"></i> Commander maintenant</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="pd-similar">
+      <h3>Produits similaires · Vous pourriez aussi aimer</h3>
+      <div class="product-grid" id="pdSimilarGrid"></div>
     </div>
   </div>
 </div>
 
-<!-- TOAST -->
+<div class="lightbox-overlay" id="lightboxOverlay">
+  <div class="lightbox-content">
+    <button class="close-btn lightbox-close" id="lightboxClose" aria-label="Fermer la photo"><i class="fa-solid fa-xmark"></i></button>
+    <div class="lightbox-zoom-wrap" id="lightboxZoomWrap">
+      <img id="lightboxImg" src="" alt="" draggable="false">
+    </div>
+    <p class="lightbox-hint">Touche/clique la photo pour zoomer, ou pince pour ajuster — glisse pour te déplacer</p>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>

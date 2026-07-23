@@ -7,14 +7,12 @@
 <meta name="robots" content="noindex, nofollow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <link rel="stylesheet" href="style.css">
 </head>
 <body class="admin-body">
 
-<!-- ===========================
-     ÉCRAN DE CONNEXION (page complète)
-=========================== -->
 <div class="admin-login-screen" id="adminLoginScreen">
   <div class="admin-login-box">
     <a href="index.html" class="logo admin-login-logo">CHACHA SHOP VIP<span class="logo-dot">.</span></a>
@@ -29,62 +27,44 @@
       <p id="adminLoginError" class="admin-login-error" style="display:none;">Mot de passe incorrect. Réessaie.</p>
       <button type="submit" class="btn btn-primary btn-full">Se connecter</button>
     </form>
-    <a href="index.html" class="admin-back-link">← Retour à la boutique</a>
+    <a href="index.html" class="admin-back-link"><i class="fa-solid fa-arrow-left"></i> Retour à la boutique</a>
   </div>
 </div>
 
-<!-- ===========================
-     TABLEAU DE BORD ADMIN (page complète, après connexion)
-=========================== -->
 <div class="admin-dashboard" id="adminDashboard" hidden>
-
   <header class="admin-topbar">
     <div class="admin-topbar-inner">
       <a href="index.html" class="logo">CHACHA SHOP VIP<span class="logo-dot">.</span></a>
-
       <nav class="admin-nav" id="adminNav">
-        <button type="button" class="admin-nav-btn active" data-tab="produits">
-          <span class="admin-nav-icon">👟</span> Produits
-        </button>
-        <button type="button" class="admin-nav-btn" data-tab="commandes">
-          <span class="admin-nav-icon">📦</span> Commandes
-          <span class="admin-tab-count" id="ordersCountBadge">0</span>
-        </button>
+        <button type="button" class="admin-nav-btn active" data-tab="produits"><i class="fa-solid fa-shoe-prints"></i> Produits</button>
+        <button type="button" class="admin-nav-btn" data-tab="commandes"><i class="fa-solid fa-box"></i> Commandes <span class="admin-tab-count" id="ordersCountBadge">0</span></button>
       </nav>
-
       <div class="admin-topbar-actions">
-        <a href="index.html" class="admin-link-btn" target="_blank" rel="noopener">Voir la boutique ↗</a>
-        <button type="button" class="admin-link-btn" id="adminLogoutBtn">Déconnexion</button>
+        <a href="index.html" class="admin-link-btn" target="_blank" rel="noopener" style="width:auto;border-radius:100px;padding:9px 16px;"><i class="fa-solid fa-arrow-up-right-from-square"></i> Voir la boutique</a>
+        <button type="button" class="admin-link-btn" id="adminLogoutBtn" style="width:auto;border-radius:100px;padding:9px 16px;"><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</button>
       </div>
     </div>
-    <!-- Nav mobile (identique, stylée en barre du bas) -->
   </header>
 
   <main class="admin-main">
-
-    <!-- Bandeau stats -->
     <div class="admin-stats-row" id="adminStatsRow"></div>
 
-    <!-- ===== Onglet Produits ===== -->
     <section class="admin-panel" id="panelProduits">
       <div class="admin-panel-head">
         <div>
           <h1 class="admin-page-title">Produits</h1>
           <p class="admin-note">Les changements sont enregistrés automatiquement sur cet appareil.</p>
         </div>
-        <button class="btn btn-primary" id="adminAddBtn">+ Ajouter un produit</button>
+        <button class="btn btn-primary" id="adminAddBtn"><i class="fa-solid fa-plus"></i> Ajouter un produit</button>
       </div>
-
       <div class="admin-filter-row">
         <button type="button" class="admin-filter-chip active" data-filter="all">Tous</button>
         <button type="button" class="admin-filter-chip" data-filter="shoe">Chaussures</button>
         <button type="button" class="admin-filter-chip" data-filter="cloth">Vêtements</button>
       </div>
-
       <div class="admin-product-list admin-product-list--page" id="adminProductList"></div>
     </section>
 
-    <!-- ===== Onglet Commandes ===== -->
     <section class="admin-panel" id="panelCommandes" hidden>
       <div class="admin-panel-head">
         <div>
@@ -92,7 +72,6 @@
           <p class="admin-note">Les commandes ci-dessous sont celles passées depuis cet appareil (navigateur). Mets à jour le statut pour que le client puisse suivre l'avancement, et contacte-le pour finaliser le paiement.</p>
         </div>
       </div>
-
       <div class="admin-filter-row" id="orderFilterRow">
         <button type="button" class="admin-filter-chip active" data-order-filter="all">Toutes</button>
         <button type="button" class="admin-filter-chip" data-order-filter="nouvelle">Nouvelles</button>
@@ -100,45 +79,41 @@
         <button type="button" class="admin-filter-chip" data-order-filter="livraison">En livraison</button>
         <button type="button" class="admin-filter-chip" data-order-filter="livree">Livrées</button>
       </div>
-
       <div class="admin-order-list admin-order-list--page" id="adminOrderList"></div>
     </section>
-
   </main>
 </div>
 
-<!-- ===========================
-     Formulaire produit (ajout / modification)
-=========================== -->
 <div class="checkout-overlay" id="adminFormOverlay">
   <div class="checkout-modal" style="max-width:520px;">
-    <button class="close-btn checkout-close" id="closeAdminForm" aria-label="Fermer">✕</button>
+    <button class="close-btn checkout-close" id="closeAdminForm" aria-label="Fermer"><i class="fa-solid fa-xmark"></i></button>
     <h3 id="adminFormTitle" style="font-family:var(--font-display);font-size:1.4rem;margin-bottom:16px;">Ajouter un produit</h3>
     <form id="adminProductForm" class="checkout-form">
       <input type="hidden" id="adminProductId">
-      <div class="form-row">
-        <label for="adminName">Nom du produit *</label>
-        <input type="text" id="adminName" required placeholder="Ex : ZENITH Mangue">
+      <div class="form-row"><label for="adminName">Nom du produit *</label><input type="text" id="adminName" required placeholder="Ex : ZENITH Mangue"></div>
+      <div class="form-row-2col">
+        <div class="form-row">
+          <label for="adminType">Type *</label>
+          <select id="adminType" required>
+            <option value="shoe">Chaussure</option>
+            <option value="cloth">Vêtement</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label for="adminAudience">Public *</label>
+          <select id="adminAudience" required>
+            <option value="homme">Homme</option>
+            <option value="femme">Femme</option>
+            <option value="enfant">Enfant</option>
+            <option value="unisexe">Unisexe</option>
+          </select>
+        </div>
       </div>
-      <div class="form-row">
-        <label for="adminType">Type *</label>
-        <select id="adminType" required>
-          <option value="shoe">Chaussure</option>
-          <option value="cloth">Vêtement</option>
-        </select>
-      </div>
-      <div class="form-row">
-        <label for="adminCat">Catégorie *</label>
-        <input type="text" id="adminCat" required placeholder="Ex : Sneaker basse">
-      </div>
-      <div class="form-row">
-        <label for="adminPrice">Prix (FCFA) *</label>
-        <input type="number" id="adminPrice" required min="0" step="500">
-      </div>
-      <div class="form-row">
-        <label for="adminOldPrice">Ancien prix (optionnel, pour affichage promo)</label>
-        <input type="number" id="adminOldPrice" min="0" step="500">
-      </div>
+      <p class="admin-note" style="margin:-6px 0 2px;">Le Type et le Public déterminent la catégorie affichée sur la page d'accueil (ex : « Chaussures Hommes », « Vêtements Enfants »…).</p>
+      <div class="form-row"><label for="adminCat">Catégorie *</label><input type="text" id="adminCat" required placeholder="Ex : Sneaker basse"></div>
+      <div class="form-row"><label for="adminDesc">Description courte</label><textarea id="adminDesc" placeholder="Ex : Sneaker basse au style urbain, semelle légère..."></textarea></div>
+      <div class="form-row"><label for="adminPrice">Prix (FCFA) *</label><input type="number" id="adminPrice" required min="0" step="500"></div>
+      <div class="form-row"><label for="adminOldPrice">Ancien prix (optionnel, pour affichage promo)</label><input type="number" id="adminOldPrice" min="0" step="500"></div>
       <div class="form-row">
         <label for="adminBadge">Badge</label>
         <select id="adminBadge">
@@ -149,11 +124,11 @@
         </select>
       </div>
       <div class="form-row">
-        <label>Photo du produit *</label>
+        <label>Photo principale du produit *</label>
         <div class="admin-upload-zone" id="adminUploadZone">
           <img id="adminImgPreview" class="admin-upload-preview" alt="Aperçu du produit" style="display:none;">
           <div class="admin-upload-placeholder" id="adminUploadPlaceholder">
-            <span class="admin-upload-icon">📷</span>
+            <i class="fa-solid fa-camera admin-upload-icon"></i>
             <span>Clique pour choisir une photo</span>
             <span class="admin-upload-hint">JPG, PNG ou WEBP</span>
           </div>
@@ -161,14 +136,9 @@
         <input type="file" id="adminImgFile" accept="image/*" style="display:none;">
         <button type="button" class="admin-remove-img-btn" id="adminRemoveImg" style="display:none;">Retirer la photo</button>
       </div>
-      <div class="form-row">
-        <label for="adminImg">Ou URL d'une image en ligne (optionnel si photo choisie)</label>
-        <input type="url" id="adminImg" placeholder="https://...">
-      </div>
-      <div class="form-row">
-        <label for="adminColors">Couleurs (codes hex séparés par une virgule)</label>
-        <input type="text" id="adminColors" placeholder="Ex : #1B1B1B,#F57224">
-      </div>
+      <div class="form-row"><label for="adminImg">Ou URL d'une image en ligne (optionnel si photo choisie)</label><input type="url" id="adminImg" placeholder="https://..."></div>
+      <div class="form-row"><label for="adminImages">Photos supplémentaires (URLs séparées par une virgule, optionnel)</label><input type="text" id="adminImages" placeholder="https://..., https://..."></div>
+      <div class="form-row"><label for="adminColors">Couleurs (codes hex séparés par une virgule)</label><input type="text" id="adminColors" placeholder="Ex : #1B1B1B,#F57224"></div>
       <div class="form-actions">
         <button type="button" class="btn btn-ghost" id="cancelAdminForm">Annuler</button>
         <button type="submit" class="btn btn-primary">Enregistrer</button>
@@ -177,7 +147,6 @@
   </div>
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
